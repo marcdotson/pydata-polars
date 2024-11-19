@@ -1,0 +1,45 @@
+/*-- scss:defaults --*/
+@import url(https://fonts.googleapis.com/css?family=News+Cycle:400,700);
+@import url(https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic);
+
+// fonts
+$font-family-sans-serif: Lato, sans-serif;
+$presentation-font-size-root: 30px;
+
+// colors
+$body-bg: #fff;
+$body-color: #000;
+$secondary: #486790;
+$tertiary: #3869a5;
+$link-color: #7aafde;
+$selection-bg: rgba(0, 0, 0, 0.99);
+
+// headings
+$presentation-heading-font: "News Cycle", sans-serif;
+
+// diagrams
+$mermaid-bg-color: $body-bg;
+$mermaid-edge-color: $secondary;
+$mermaid-node-fg-color: $secondary;
+$mermaid-fg-color: $secondary;
+
+/*-- scss:rules --*/
+.reveal .slide-number > a[href*='title-slide'] {
+  display: none;
+}
+
+.reveal section h2 {
+  color: #486790;
+}
+
+.h-center {
+  text-align: center;
+}
+
+.v-center {
+  display: flex !important;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
