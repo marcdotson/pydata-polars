@@ -1,8 +1,10 @@
 ---
-title: | 
-  | An Introduction to Python 
-  | for R Users
-author: "Marc Dotson"
+title: Data Wrangling with Polars
+subtitle: |
+  | PyData Northern Utah
+  | [github.com/marcdotson/pydata-polars](https://github.com/marcdotson/pydata-polars)
+author: Marc Dotson
+date: 2024-11-20
 title-slide-attributes:
   data-background-color: "#486790"
 format: 
@@ -15,119 +17,51 @@ execute:
   echo: true
 ---
 
-## 
-
-:::: {.columns .v-center}
-
-::: {.column width="50%"}
-![](r.png){fig-align="center"}
-:::
-
-::: {.column width="50%"}
-![](python.png){fig-align="center"}
-:::
-
-::::
-
-## 
-
-:::: {.columns .v-center}
-
-::: {.column width="50%"}
-### R
-
-::: {.incremental}
-- Specialized language
-- Developed by statisticians
-- Lazy about efficiency
-- Lazy about namespacing
-- Functional programming
-- Small and medium data
-- Data wrangling and visualization
-- Spacing is for convenience
-- Dominated by Posit
-- R Markdown and Quarto
-- Consistency in the tidyverse
-- "R Users" and "Tidy" code
-:::
-:::
-
-::: {.column width="50%"}
-### Python
-
-::: {.incremental}
-- General language
-- Developed by computer scientists
-- Obsessed with efficiency
-- Obsessed with namespacing
-- Object-oriented programming
-- Small, medium, and large data
-- Machine learning and deep learning
-- Spacing is part of the syntax
-- No single authority
-- Jupyter Notebooks
-- Inconsistent (i.e., no tidyverse)
-- "Pythonistas" and "Pythonic" code
-:::
-:::
-
-::::
+# Why Polars?
 
 ## 
 
 :::: {.columns .v-center}
 
 ::: {.column width="40%"}
-![](python.png){fig-align="center"}
+![](../figures/polars.png){fig-align="center"}
 :::
 
 ::: {.column width="60%"}
-![](rstudio.png){fig-align="center"}
+::: {.incremental}
+- Newer open source library for data wrangling
+- Alternative to Pandas for manipulating DataFrames
+- **Fast** -- written in Rust, uses Apache Arrow, built to parallelize and use GPUs, allows for lazy evaluation
+- More consistent syntax than Pandas
+- Anagram of its query engine (OLAP) and Rust (rs)
+:::
 :::
 
 ::::
 
-## Python/RStudio Orientation
-
-- Open the Python intro project [here](https://posit.cloud/spaces/322372/join?access_code=_6edH0PA4_FTpmCCKGH-0p3kDHs3lEcBVlXdO3JD).
-- Code in a Python script or a Quarto document.
-  + In Quarto, code cells need to be labeled with `{python}`.
-  + All of today's code in already in `python-intro.qmd`.
-- When you run Python code, note the `reticulate::repl_python()` call. REPL means "read-eval-print loop," which is an interactive coding environment like you're used to (the opposite would be coding that had to be compiled).
-- The Console's `>>>` indicates you're operating in Python.
-
-## The Python Data Stack
-
-The Python data (i.e., PyData) stack refers to the ecosystem of packages that enables data analysis.
-
-- NumPy is short for "Numerical Python." It includes arrays and efficient computation across arrays.
-- pandas is short for "panel data." It is built on NumPy and adds data frames for tabular or "heterogeneous" data and is the most popular package for data wrangling.
-- Polars is a newer package for data wrangling. It's name is an anagram of the query engine it uses (OLAP) and the language it's built in (Rust or rs).
-- matplotlib provides a foundation for plotting.
-- seaborn is built on matplotlib and integrates with pandas. seaborn.objects is a more consistent API based on grammar of graphics.
-- scikit-learn is a machine learning library built on NumPy, SciPy, and matplotlib.
-
-# Data Wrangling with Polars
+# Using Polars
 
 ## Load Packages and Data
 
-Packages (i.e., libraries) and modules (i.e., a kind of sub-library) are imported with **aliases**. When you use functions from a package, you reference `package.function()`. This is like `package::function()` in R.
-
-Everything is an object. Depending on the object *type* you have access to their corresponding:
-
-- **attributes** as in `object.attribute`
-- **methods**, which are object-specific functions, as in `object.method()`
+After installing with `pip install polars`, we can import Polars and read in data.
 
 ::: {.panel-tabset .scrollable}
-## Python
+## Polars
 
 ```{python}
 import polars as pl
-import polars.selectors as cs
 
-customer_data = pl.read_csv('customer_data.csv')
-customer_data.shape
-customer_data.columns
+customer_data = pl.read_csv('data/customer_data.csv')
+customer_data
+```
+
+## Pandas
+
+```{python}
+import pandas as pd
+
+customer_data_pd = pd.read_csv('data/customer_data.csv')
+customer_data_pd
 ```
 
 ## R
@@ -135,22 +69,19 @@ customer_data.columns
 ```{r}
 library(tidyverse)
 
-customer_data <- read_csv("customer_data.csv")
-
-glimpse(customer_data)
+customer_data <- read_csv("data/customer_data.csv")
+customer_data
 ```
 :::
 
 ## Filter Observations
 
-Polars **DataFrames** have methods that are similar to {dplyr} since they're both mirroring SQL. DataFrames are composed of columns called **Series** (i.e., equivalent to vectors). Unlike pandas DataFrames, Polars DataFrames don't have a **row index**.
+Polars **DataFrames** have methods that mirror SQL. DataFrames are still composed of columns called **Series**, however, unlike Pandas DataFrames, Polars DataFrames don't have a **row index** (so no need to `.reset_index()`).
 
-We would reference column names with `data['column_name']` (like R's `data$column_name` or `data["column_name"]` or just `column_name` with tidyeval), but Polars allows for `pl.col('column_name')`.
-
-We use quotation marks for every column name.
+Additionally, instead of relying on Panda's `.loc[]` **property**, Polars includes function-like **expressions** like `pl.col('column_name')`.
 
 ::: {.panel-tabset .scrollable}
-## Python
+## Polars
 
 ```{python}
 customer_data.filter(pl.col('college_degree') == 'Yes')
@@ -158,28 +89,40 @@ customer_data.filter(pl.col('region') != 'West')
 customer_data.filter(pl.col('gender') != 'Female', pl.col('income') > 70000)
 ```
 
+## Pandas
+
+```{python}
+customer_data_pd.loc[customer_data_pd['college_degree'] == 'Yes']
+customer_data_pd.loc[customer_data_pd['region'] != 'West']
+customer_data_pd.loc[(customer_data_pd['gender'] != 'Female') & (customer_data_pd['income'] > 70000)]
+```
+
 ## R
 
 ```{r}
 filter(customer_data, college_degree == "Yes")
-
 filter(customer_data, region != "West")
-
 filter(customer_data, gender == "Female", income > 70000)
 ```
 :::
 
 ## Slice Observations
 
-Python is **zero-indexed**. This is probably the most problematic (and very computer science-based) difference and why it's nice to avoid indexing if you can!
+The parameters for Polars' `.slice()` method are the start index and the length.
 
-The parameters for Polars' `.slice()` are the start index and the length.
+We similarly don't need to rely on Panda's `.iloc[]` property.
 
 ::: {.panel-tabset .scrollable}
-## Python
+## Polars
 
 ```{python}
 customer_data.slice(0, 5)
+```
+
+## Pandas
+
+```{python}
+customer_data_pd.iloc[0:5]
 ```
 
 ## R
@@ -191,46 +134,47 @@ slice(customer_data, 1:5)
 
 ## Arrange Observations
 
-It can be strange at first, but **namespacing** is critical.
-
-- A function is preceded by the package name (e.g., `pl.col()`), unless you import the specific function (e.g., `from polars import col`).
-- A method is preceded by an object name of a certain type (e.g., `customer_data.sort()`).
-- Since object types are tied to packages, the chain back to the corresponding package is always present, explicitly or implicitly.
-
-Note that its `True` and `False`, not `TRUE` and `FALSE` or `true` and `false`.
+Instead of using `[ ]` like in Pandas, in Polars we rely on expressions like `pl.col()`.
 
 ::: {.panel-tabset .scrollable}
-## Python
+## Polars
 
 ```{python}
 customer_data.sort(pl.col('birth_year'))
-customer_data.sort(pl.col('birth_year'), descending=True)
+customer_data.sort(pl.col('birth_year'), descending = True)
+```
+
+## Pandas
+
+```{python}
+customer_data_pd.sort_values('birth_year')
+customer_data_pd.sort_values('birth_year', ascending = False)
 ```
 
 ## R
 
 ```{r}
 arrange(customer_data, birth_year)
-
 arrange(customer_data, desc(birth_year))
 ```
 :::
 
 ## Select Variables
 
-Using single square brackets `[ ]` creates a **list**. This is similar to creating a vector in R with `c()`. A list is a fundamental Python object type and can be turned into a Series.
-
-Function (and method) arguments are also called **parameters**.
-
-- Some parameters are **positional** that have to be specified in the exact position.
-- Others are **keyword or named** (like in R).
+Polars separates out `.filter()` and `.select()` that are combined in Pandas' `.loc[]`.
 
 ::: {.panel-tabset .scrollable}
-## Python
+## Polars
 
 ```{python}
 customer_data.select(pl.col('region'), pl.col('review_text'))
 customer_data.select(pl.col(['region', 'review_text']))
+```
+
+## Pandas
+
+```{python}
+customer_data_pd.loc[:, ['region', 'review_text']]
 ```
 
 ## R
@@ -245,10 +189,16 @@ select(customer_data, region, review_text)
 Polars is actually a query language, like SQL. So it's not surprising to see methods with names that more closely mirror queries, like the `.with_columns()` method.
 
 ::: {.panel-tabset .scrollable}
-## Python
+## Polars
 
 ```{python}
 customer_data.with_columns(income = pl.col('income') / 1000)
+```
+
+## Pandas
+
+```{python}
+customer_data_pd.with_columns(income = pl.col('income') / 1000)
 ```
 
 ## R
@@ -263,7 +213,7 @@ mutate(customer_data, income = income / 1000)
 Missing values are identified as `NaN`. Series types include `str`, `bytes` (binary), `float`, `bool`, and `int`.
 
 ::: {.panel-tabset .scrollable}
-## Python
+## Polars
 
 ```{python}
 store_transactions = pl.read_csv('store_transactions.csv')
@@ -296,7 +246,7 @@ While possible with Python code generally, Polars embraces writing consecutive l
 - You'll have to select and run the whole thing at once
 
 ::: {.panel-tabset .scrollable}
-## Python
+## Polars
 
 ```{python}
 (customer_data
@@ -327,7 +277,7 @@ customer_data |>
 The `.agg()` method stands for *aggregate*, which is exactly what `summarize()` does in R.
 
 ::: {.panel-tabset .scrollable}
-## Python
+## Polars
 
 ```{python}
 (customer_data
@@ -360,7 +310,7 @@ This is a good example of where object-oriented programming requires a different
 - Instead, `.mean()` is a method for Polars Series and DataFrames.
 
 ::: {.panel-tabset .scrollable}
-## Python
+## Polars
 
 ```{python}
 (customer_data
@@ -393,7 +343,7 @@ customer_data |>
 We only use `.agg()` with `.group_by()`.
 
 ::: {.panel-tabset .scrollable}
-## Python
+## Polars
 
 ```{python}
 (customer_data
@@ -421,36 +371,8 @@ customer_data |>
 ```
 :::
 
-# What Next?
+## Next Steps
 
-## 
+- [Polars](https://docs.pola.rs) is still under development.
 
-:::: {.columns .v-center}
-
-::: {.column width="100%"}
-![](xkcd_python-env.png){width=60% fig-align="center"}
-:::
-
-::::
-
-## Installation and Reproducible Environments
-
-Python uses **reproducible environments** (and R should as well). A reproducible environment is a lot like RStudio projects but where each project has:
-
-- A specific version of Python identified
-- Its own library of installed packages
-
-This helps us make sure that projects work even after certain functionality gets deprecated and makes sure we don't make *big* mistakes (like **using or messing with your operating system's version of Python**).
-
-I wrote a [blog post](https://occasionaldivergences.com/posts/rep-env/) about reproducible environments in R and Python. And here's some helpful [installation instructions](https://chendaniely.github.io/python_setup/210-python_install.html) for Python specifically.
-
-## Final Thoughts
-
-- Don't be afraid to use the best of R and Python interchangeably.
-- Maintaining different styles may help you keep separate mindsets.
-- Besides RStudio, VS Code is a great code editor.
-- There are great resources online for [R Users learning Python](https://emilyriederer.netlify.app/post/py-rgo/).
-- [Polars](https://docs.pola.rs) is still under development as is [seaborn.objects](https://seaborn.pydata.org/tutorial/objects_interface.html), but both are worth following.
-- [pandas](https://wesmckinney.com/book/) is still the most popular as a complement to NumPy.
-- Master the basics so you can effectively use Copilot, ChatGPT, etc.
 

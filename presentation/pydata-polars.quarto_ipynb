@@ -1,0 +1,549 @@
+{
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "---\n",
+        "title: Data Wrangling with Polars\n",
+        "subtitle: |\n",
+        "  | PyData Northern Utah\n",
+        "  | [github.com/marcdotson/pydata-polars](https://github.com/marcdotson/pydata-polars)\n",
+        "author: Marc Dotson\n",
+        "date: 2024-11-20\n",
+        "title-slide-attributes:\n",
+        "  data-background-color: \"#486790\"\n",
+        "format: \n",
+        "  revealjs:\n",
+        "    theme: marc.scss     # Modified simple theme.\n",
+        "    slide-number: c/t    # Numbered slides current/total.\n",
+        "    self-contained: true # Render to a single HTML file.\n",
+        "execute:\n",
+        "  eval: false\n",
+        "  echo: true\n",
+        "jupyter: python3\n",
+        "---\n",
+        "\n",
+        "\n",
+        "# Why Polars?\n",
+        "\n",
+        "## \n",
+        "\n",
+        ":::: {.columns .v-center}\n",
+        "\n",
+        "::: {.column width=\"40%\"}\n",
+        "![](../figures/polars.png){fig-align=\"center\"}\n",
+        ":::\n",
+        "\n",
+        "::: {.column width=\"60%\"}\n",
+        "::: {.incremental}\n",
+        "- Newer open source library for data wrangling\n",
+        "- Alternative to Pandas for manipulating DataFrames\n",
+        "- **Fast** -- written in Rust, uses Apache Arrow, built to parallelize and use GPUs, allows for lazy evaluation\n",
+        "- More consistent syntax than Pandas\n",
+        "- Anagram of its query engine (OLAP) and Rust (rs)\n",
+        ":::\n",
+        ":::\n",
+        "\n",
+        "::::\n",
+        "\n",
+        "# Using Polars\n",
+        "\n",
+        "## Load Packages and Data\n",
+        "\n",
+        "After installing with `pip install polars`, we can import polars and read in data.\n",
+        "\n",
+        "::: {.panel-tabset .scrollable}\n",
+        "## Python\n"
+      ],
+      "id": "b5b87595"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "#| eval: true\n",
+        "import polars as pl\n",
+        "\n",
+        "customer_data = pl.read_csv('data/customer_data.csv')\n",
+        "customer_data"
+      ],
+      "id": "9c49eb05",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Pandas"
+      ],
+      "id": "1ef1d529"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "import pandas as pd\n",
+        "\n",
+        "customer_data = pd.read_csv('data/customer_data.csv')\n",
+        "customer_data"
+      ],
+      "id": "beb6cfb7",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## R\n",
+        "\n",
+        "\n",
+        "```{r}\n",
+        "library(tidyverse)\n",
+        "\n",
+        "customer_data <- read_csv(\"data/customer_data.csv\")\n",
+        "customer_data\n",
+        "```\n",
+        "\n",
+        ":::\n",
+        "\n",
+        "## Filter Observations\n",
+        "\n",
+        "Polars **DataFrames** have methods that are similar to {dplyr} since they're both mirroring SQL. DataFrames are composed of columns called **Series** (i.e., equivalent to vectors). Unlike pandas DataFrames, Polars DataFrames don't have a **row index**.\n",
+        "\n",
+        "We would reference column names with `data['column_name']` (like R's `data$column_name` or `data[\"column_name\"]` or just `column_name` with tidyeval), but Polars allows for `pl.col('column_name')`.\n",
+        "\n",
+        "We use quotation marks for every column name.\n",
+        "\n",
+        "::: {.panel-tabset .scrollable}\n",
+        "## Python\n"
+      ],
+      "id": "2f6905c5"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "customer_data.filter(pl.col('college_degree') == 'Yes')\n",
+        "customer_data.filter(pl.col('region') != 'West')\n",
+        "customer_data.filter(pl.col('gender') != 'Female', pl.col('income') > 70000)"
+      ],
+      "id": "277d419b",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## R\n",
+        "\n",
+        "\n",
+        "```{r}\n",
+        "filter(customer_data, college_degree == \"Yes\")\n",
+        "\n",
+        "filter(customer_data, region != \"West\")\n",
+        "\n",
+        "filter(customer_data, gender == \"Female\", income > 70000)\n",
+        "```\n",
+        "\n",
+        ":::\n",
+        "\n",
+        "## Slice Observations\n",
+        "\n",
+        "Python is **zero-indexed**. This is probably the most problematic (and very computer science-based) difference and why it's nice to avoid indexing if you can!\n",
+        "\n",
+        "The parameters for Polars' `.slice()` are the start index and the length.\n",
+        "\n",
+        "::: {.panel-tabset .scrollable}\n",
+        "## Python\n"
+      ],
+      "id": "f5faff15"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "customer_data.slice(0, 5)"
+      ],
+      "id": "f0e144ab",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## R\n",
+        "\n",
+        "\n",
+        "```{r}\n",
+        "slice(customer_data, 1:5)\n",
+        "```\n",
+        "\n",
+        ":::\n",
+        "\n",
+        "## Arrange Observations\n",
+        "\n",
+        "It can be strange at first, but **namespacing** is critical.\n",
+        "\n",
+        "- A function is preceded by the package name (e.g., `pl.col()`), unless you import the specific function (e.g., `from polars import col`).\n",
+        "- A method is preceded by an object name of a certain type (e.g., `customer_data.sort()`).\n",
+        "- Since object types are tied to packages, the chain back to the corresponding package is always present, explicitly or implicitly.\n",
+        "\n",
+        "Note that its `True` and `False`, not `TRUE` and `FALSE` or `true` and `false`.\n",
+        "\n",
+        "::: {.panel-tabset .scrollable}\n",
+        "## Python\n"
+      ],
+      "id": "0b583539"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "customer_data.sort(pl.col('birth_year'))\n",
+        "customer_data.sort(pl.col('birth_year'), descending=True)"
+      ],
+      "id": "026862a0",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## R\n",
+        "\n",
+        "\n",
+        "```{r}\n",
+        "arrange(customer_data, birth_year)\n",
+        "\n",
+        "arrange(customer_data, desc(birth_year))\n",
+        "```\n",
+        "\n",
+        ":::\n",
+        "\n",
+        "## Select Variables\n",
+        "\n",
+        "Using single square brackets `[ ]` creates a **list**. This is similar to creating a vector in R with `c()`. A list is a fundamental Python object type and can be turned into a Series.\n",
+        "\n",
+        "Function (and method) arguments are also called **parameters**.\n",
+        "\n",
+        "- Some parameters are **positional** that have to be specified in the exact position.\n",
+        "- Others are **keyword or named** (like in R).\n",
+        "\n",
+        "::: {.panel-tabset .scrollable}\n",
+        "## Python\n"
+      ],
+      "id": "151bd08c"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "customer_data.select(pl.col('region'), pl.col('review_text'))\n",
+        "customer_data.select(pl.col(['region', 'review_text']))"
+      ],
+      "id": "42784999",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## R\n",
+        "\n",
+        "\n",
+        "```{r}\n",
+        "select(customer_data, region, review_text)\n",
+        "```\n",
+        "\n",
+        ":::\n",
+        "\n",
+        "## Mutate Variables\n",
+        "\n",
+        "Polars is actually a query language, like SQL. So it's not surprising to see methods with names that more closely mirror queries, like the `.with_columns()` method.\n",
+        "\n",
+        "::: {.panel-tabset .scrollable}\n",
+        "## Python\n"
+      ],
+      "id": "b968a716"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "customer_data.with_columns(income = pl.col('income') / 1000)"
+      ],
+      "id": "b55952d4",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## R\n",
+        "\n",
+        "\n",
+        "```{r}\n",
+        "mutate(customer_data, income = income / 1000)\n",
+        "```\n",
+        "\n",
+        ":::\n",
+        "\n",
+        "## Join Data Frames\n",
+        "\n",
+        "Missing values are identified as `NaN`. Series types include `str`, `bytes` (binary), `float`, `bool`, and `int`.\n",
+        "\n",
+        "::: {.panel-tabset .scrollable}\n",
+        "## Python\n"
+      ],
+      "id": "ed1efc45"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "store_transactions = pl.read_csv('store_transactions.csv')\n",
+        "store_transactions.shape\n",
+        "store_transactions.columns\n",
+        "\n",
+        "customer_data.join(store_transactions, on='customer_id', how='left')\n",
+        "customer_data.join(store_transactions, on='customer_id', how='inner')"
+      ],
+      "id": "1493b4eb",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## R\n",
+        "\n",
+        "\n",
+        "```{r}\n",
+        "store_transactions <- read_csv(\"store_transactions.csv\")\n",
+        "\n",
+        "glimpse(store_transactions)\n",
+        "\n",
+        "left_join(customer_data, store_transactions, join_by(customer_id))\n",
+        "\n",
+        "inner_join(customer_data, store_transactions, join_by(customer_id))\n",
+        "```\n",
+        "\n",
+        ":::\n",
+        "\n",
+        "## Consecutive Lines of Code\n",
+        "\n",
+        "While possible with Python code generally, Polars embraces writing consecutive lines of code using **method chaining**. Note that:\n",
+        "\n",
+        "- The entire chain needs to be surrounded with `( )`\n",
+        "- Each line *starts* with `.`\n",
+        "- You'll have to select and run the whole thing at once\n",
+        "\n",
+        "::: {.panel-tabset .scrollable}\n",
+        "## Python\n"
+      ],
+      "id": "16add2b9"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "(customer_data\n",
+        " .join(store_transactions, on='customer_id', how='left')\n",
+        " .filter(pl.col('region') == 'West', pl.col('feb_2005') == pl.col('feb_2005').max())\n",
+        " .with_columns(age = 2024 - pl.col('birth_year'))\n",
+        " .select(pl.col(['age', 'feb_2005']))\n",
+        " .sort(pl.col('age'), descending=True)\n",
+        " .slice(0, 1)\n",
+        ")"
+      ],
+      "id": "5a5751eb",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## R\n",
+        "\n",
+        "\n",
+        "```{r}\n",
+        "customer_data |> \n",
+        "  left_join(store_transactions, join_by(customer_id)) |> \n",
+        "  filter(region == \"West\", feb_2005 == max(feb_2005)) |> \n",
+        "  mutate(age = 2024 - birth_year) |> \n",
+        "  select(age, feb_2005) |> \n",
+        "  arrange(desc(age)) |> \n",
+        "  slice(1)\n",
+        "```\n",
+        "\n",
+        ":::\n",
+        "\n",
+        "## Summarize Discrete Data\n",
+        "\n",
+        "The `.agg()` method stands for *aggregate*, which is exactly what `summarize()` does in R.\n",
+        "\n",
+        "::: {.panel-tabset .scrollable}\n",
+        "## Python\n"
+      ],
+      "id": "8f92ebf2"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "(customer_data\n",
+        " .group_by(pl.col('region'))\n",
+        " .agg(n = pl.len())\n",
+        ")\n",
+        "\n",
+        "(customer_data\n",
+        " .group_by(pl.col(['region', 'college_degree']))\n",
+        " .agg(n = pl.len())\n",
+        ")"
+      ],
+      "id": "e81065cd",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## R\n",
+        "\n",
+        "\n",
+        "```{r}\n",
+        "customer_data |> \n",
+        "  count(region)\n",
+        "\n",
+        "customer_data |> \n",
+        "  count(region, college_degree)\n",
+        "```\n",
+        "\n",
+        ":::\n",
+        "\n",
+        "## Summarize Continuous Data\n",
+        "\n",
+        "This is a good example of where object-oriented programming requires a different mindset.\n",
+        "\n",
+        "- You might think that there is a general `mean()` function like in R, but there isn't and you'd have to load a specific package from the PyData stack and reference its namespace to activate such a function.\n",
+        "- Instead, `.mean()` is a method for Polars Series and DataFrames.\n",
+        "\n",
+        "::: {.panel-tabset .scrollable}\n",
+        "## Python\n"
+      ],
+      "id": "d1442709"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "(customer_data\n",
+        "  .select(pl.col('income'))\n",
+        "  .mean()\n",
+        ")\n",
+        "\n",
+        "(customer_data\n",
+        "  .select(pl.col(['income', 'credit']))\n",
+        "  .mean()\n",
+        ")"
+      ],
+      "id": "103eee5d",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## R\n",
+        "\n",
+        "\n",
+        "```{r}\n",
+        "customer_data |>\n",
+        "  summarize(avg_income = mean(income))\n",
+        "\n",
+        "customer_data |>\n",
+        "  summarize(\n",
+        "    avg_income = mean(income),\n",
+        "    avg_credit = mean(credit)\n",
+        "  )\n",
+        "```\n",
+        "\n",
+        ":::\n",
+        "\n",
+        "## Summarize Discrete and Continuous Data\n",
+        "\n",
+        "We only use `.agg()` with `.group_by()`.\n",
+        "\n",
+        "::: {.panel-tabset .scrollable}\n",
+        "## Python\n"
+      ],
+      "id": "f14af61c"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "(customer_data\n",
+        " .group_by(pl.col(['gender', 'region']))\n",
+        " .agg(\n",
+        "   n = pl.len(), \n",
+        "   avg_income = pl.col('income').mean(), \n",
+        "   avg_credit = pl.col('credit').mean()\n",
+        "  )\n",
+        " .sort(pl.col('avg_income'), descending=True)\n",
+        ")"
+      ],
+      "id": "bd92daf2",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## R\n",
+        "\n",
+        "\n",
+        "```{r}\n",
+        "customer_data |>\n",
+        "  group_by(gender, region) |>\n",
+        "  summarize(\n",
+        "    n = n(),\n",
+        "    avg_income = mean(income),\n",
+        "    avg_credit = mean(credit)\n",
+        "  ) |> \n",
+        "  arrange(desc(avg_income))\n",
+        "```\n",
+        "\n",
+        ":::\n",
+        "\n",
+        "## Next Steps\n",
+        "\n",
+        "- [Polars](https://docs.pola.rs) is still under development.\n"
+      ],
+      "id": "d9d22b29"
+    }
+  ],
+  "metadata": {
+    "kernelspec": {
+      "name": "python3",
+      "language": "python",
+      "display_name": "Python 3 (ipykernel)",
+      "path": "/Users/a00714634/.pyenv/versions/3.12.4/share/jupyter/kernels/python3"
+    }
+  },
+  "nbformat": 4,
+  "nbformat_minor": 5
+}
