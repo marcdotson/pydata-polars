@@ -17,8 +17,6 @@ execute:
   echo: true
 ---
 
-# Why Polars?
-
 ## 
 
 :::: {.columns .v-center}
@@ -38,8 +36,6 @@ execute:
 :::
 
 ::::
-
-# Using Polars
 
 ## Load Packages and Data
 
@@ -184,7 +180,7 @@ select(customer_data, region, review_text)
 ```
 :::
 
-## Mutate Variables
+## Add Variables
 
 Polars is actually a query language, like SQL. So it's not surprising to see methods with names that more closely mirror queries, like the `.with_columns()` method.
 
@@ -192,13 +188,13 @@ Polars is actually a query language, like SQL. So it's not surprising to see met
 ## Polars
 
 ```{python}
-customer_data.with_columns(income = pl.col('income') / 1000)
+customer_data.with_columns(income_new = pl.col('income') / 1000)
 ```
 
 ## Pandas
 
 ```{python}
-customer_data_pd.with_columns(income = pl.col('income') / 1000)
+customer_data_pd.assign(income_new = customer_data_pd['income'] / 1000)
 ```
 
 ## R
@@ -216,24 +212,28 @@ Missing values are identified as `NaN`. Series types include `str`, `bytes` (bin
 ## Polars
 
 ```{python}
-store_transactions = pl.read_csv('store_transactions.csv')
-store_transactions.shape
-store_transactions.columns
+store_transactions = pl.read_csv('data/store_transactions.csv')
+store_transactions
 
 customer_data.join(store_transactions, on='customer_id', how='left')
-customer_data.join(store_transactions, on='customer_id', how='inner')
+```
+
+## Pandas
+
+```{python}
+store_transactions_pd = pd.read_csv('data/store_transactions.csv')
+store_transactions_pd
+
+customer_data_pd.set_index('customer_id').join(store_transactions_pd.set_index('customer_id'))
 ```
 
 ## R
 
 ```{r}
 store_transactions <- read_csv("store_transactions.csv")
-
-glimpse(store_transactions)
+store_transactions
 
 left_join(customer_data, store_transactions, join_by(customer_id))
-
-inner_join(customer_data, store_transactions, join_by(customer_id))
 ```
 :::
 
@@ -243,19 +243,36 @@ While possible with Python code generally, Polars embraces writing consecutive l
 
 - The entire chain needs to be surrounded with `( )`
 - Each line *starts* with `.`
-- You'll have to select and run the whole thing at once
+- You run the whole black of code at once
 
 ::: {.panel-tabset .scrollable}
 ## Polars
 
 ```{python}
 (customer_data
- .join(store_transactions, on='customer_id', how='left')
- .filter(pl.col('region') == 'West', pl.col('feb_2005') == pl.col('feb_2005').max())
- .with_columns(age = 2024 - pl.col('birth_year'))
- .select(pl.col(['age', 'feb_2005']))
- .sort(pl.col('age'), descending=True)
- .slice(0, 1)
+  .join(store_transactions, on='customer_id', how='left')
+  .filter(pl.col('region') == 'West', pl.col('feb_2005') == pl.col('feb_2005').max())
+  .with_columns(age = 2024 - pl.col('birth_year'))
+  .select(pl.col(['age', 'feb_2005']))
+  .sort(pl.col('age'), descending=True)
+  .slice(0, 1)
+)
+```
+
+## Pandas
+
+```{python}
+crm_data_pd = (customer_data_pd
+  .set_index('customer_id')
+  .join(store_transactions_pd.set_index('customer_id'))
+)
+
+(crm_data_pd
+  .loc[(crm_data_pd['region'] == 'West') & (crm_data_pd['feb_2005'] == crm_data_pd['feb_2005'].max())]
+  .assign(age = 2024 - crm_data_pd['birth_year'])
+  .loc[:, ['age', 'feb_2005']]
+  .sort_values('age', ascending = False)
+  .iloc[0:1]
 )
 ```
 
@@ -372,6 +389,8 @@ customer_data |>
 :::
 
 ## Next Steps
+
+We haven't even used lazy evaluation!
 
 - [Polars](https://docs.pola.rs) is still under development.
 
