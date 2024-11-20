@@ -128,9 +128,9 @@ slice(customer_data, 1:5)
 ```
 :::
 
-## Arrange Observations
+## Sort Observations
 
-Instead of using `[ ]` like in Pandas, in Polars we rely on expressions like `pl.col()`.
+To reiterate, instead of using `[ ]` like in Pandas, in Polars we rely on expressions like `pl.col()`.
 
 ::: {.panel-tabset .scrollable}
 ## Polars
@@ -206,7 +206,7 @@ mutate(customer_data, income = income / 1000)
 
 ## Join Data Frames
 
-Missing values are identified as `NaN`. Series types include `str`, `bytes` (binary), `float`, `bool`, and `int`.
+Joins are straightforward.
 
 ::: {.panel-tabset .scrollable}
 ## Polars
@@ -215,7 +215,7 @@ Missing values are identified as `NaN`. Series types include `str`, `bytes` (bin
 store_transactions = pl.read_csv('data/store_transactions.csv')
 store_transactions
 
-customer_data.join(store_transactions, on='customer_id', how='left')
+customer_data.join(store_transactions, on = 'customer_id', how = 'left')
 ```
 
 ## Pandas
@@ -239,7 +239,7 @@ left_join(customer_data, store_transactions, join_by(customer_id))
 
 ## Consecutive Lines of Code
 
-While possible with Python code generally, Polars embraces writing consecutive lines of code using **method chaining**. Note that:
+While possible with Python code generally, Polars especially embraces writing consecutive lines of code using **method chaining**. Note that:
 
 - The entire chain needs to be surrounded with `( )`
 - Each line *starts* with `.`
@@ -290,8 +290,6 @@ customer_data |>
 :::
 
 ## Summarize Discrete Data
-
-The `.agg()` method allows us to *aggregate*.
 
 ::: {.panel-tabset .scrollable}
 ## Polars
@@ -411,7 +409,6 @@ customer_data |>
 customer_data |>
   group_by(gender, region) |>
   summarize(
-    n = n(),
     avg_income = mean(income),
     avg_credit = mean(credit)
   ) |> 
@@ -419,10 +416,19 @@ customer_data |>
 ```
 :::
 
-## Next Steps
+# Don't forget lazy evaluation!
 
-We haven't even used lazy evaluation!
+## Resources
 
-- [Polars](https://docs.pola.rs) is still under development.
+- [Lazy API](https://docs.pola.rs/user-guide/concepts/lazy-api/)
+- [Modern Polars](https://kevinheavey.github.io/modern-polars/)
+- [Polars for Data Analysis in Python](https://www.youtube.com/watch?v=5V_MvnwTVwc)
+- [Understanding Expressions when you're used to pandas](https://www.youtube.com/watch?v=kPtUPe5Egak)
+- [Polars’ Rgonomic Patterns](https://emilyriederer.netlify.app/post/py-rgo-polars/)
 
+# Thank you! {background-color="#486790"}
+
+[marc.dotson@usu.edu](mailto:marc.dotson@usu.edu)  
+[github.com/marcdotson](https://github.com/marcdotson)  
+[occasionaldivergences.com](https://occasionaldivergences.com)
 
