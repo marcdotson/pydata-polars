@@ -1223,11 +1223,6 @@ Marc Dotson
 
   <p class="date">2024-11-20</p>
 </section>
-<section>
-<section id="why-polars" class="title-slide slide level1 center">
-<h1>Why Polars?</h1>
-
-</section>
 <section id="section" class="slide level2">
 <h2></h2>
 <div class="columns v-center">
@@ -1248,17 +1243,12 @@ Marc Dotson
 </ul>
 </div>
 </div></div>
-</section></section>
-<section>
-<section id="using-polars" class="title-slide slide level1 center">
-<h1>Using Polars</h1>
-
 </section>
 <section id="load-packages-and-data" class="slide level2">
 <h2>Load Packages and Data</h2>
 <p>After installing with <code>pip install polars</code>, we can import Polars and read in data.</p>
 <div class="panel-tabset scrollable">
-<ul id="tabset-1" class="panel-tabset-tabby"><li><a data-tabby-default href="#tabset-1-1">Python</a></li><li><a href="#tabset-1-2">Pandas</a></li><li><a href="#tabset-1-3">R</a></li></ul>
+<ul id="tabset-1" class="panel-tabset-tabby"><li><a data-tabby-default href="#tabset-1-1">Polars</a></li><li><a href="#tabset-1-2">Pandas</a></li><li><a href="#tabset-1-3">R</a></li></ul>
 <div class="tab-content scrollable">
 <div id="tabset-1-1">
 <div class="cell">
@@ -1272,8 +1262,8 @@ Marc Dotson
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb2-2"><a href></a></span>
-<span id="cb2-3"><a href></a>customer_data <span class="op">=</span> pd.read_csv(<span class="st">&#39;data/customer_data.csv&#39;</span>)</span>
-<span id="cb2-4"><a href></a>customer_data</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-3"><a href></a>customer_data_pd <span class="op">=</span> pd.read_csv(<span class="st">&#39;data/customer_data.csv&#39;</span>)</span>
+<span id="cb2-4"><a href></a>customer_data_pd</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 <div id="tabset-1-3">
@@ -1286,15 +1276,13 @@ Marc Dotson
 </div>
 </div>
 </div>
-<p>Note that a Polars DataFrame does not have a row index.</p>
 </section>
 <section id="filter-observations" class="slide level2">
 <h2>Filter Observations</h2>
-<p>Polars <strong>DataFrames</strong> have methods that are similar to {dplyr} since they’re both mirroring SQL. DataFrames are composed of columns called <strong>Series</strong> (i.e., equivalent to vectors). Unlike pandas DataFrames, Polars DataFrames don’t have a <strong>row index</strong>.</p>
-<p>We would reference column names with <code>data[&#39;column_name&#39;]</code> (like R’s <code>data$column_name</code> or <code>data[&quot;column_name&quot;]</code> or just <code>column_name</code> with tidyeval), but Polars allows for <code>pl.col(&#39;column_name&#39;)</code>.</p>
-<p>We use quotation marks for every column name.</p>
+<p>Polars <strong>DataFrames</strong> have methods that mirror SQL. DataFrames are still composed of columns called <strong>Series</strong>, however, unlike Pandas DataFrames, Polars DataFrames don’t have a <strong>row index</strong> (so no need to <code>.reset_index()</code>).</p>
+<p>Additionally, instead of relying on Pandas’ <code>.loc[]</code> <strong>property</strong>, Polars includes function-like <strong>expressions</strong> like <code>pl.col(&#39;column_name&#39;)</code>.</p>
 <div class="panel-tabset scrollable">
-<ul id="tabset-2" class="panel-tabset-tabby"><li><a data-tabby-default href="#tabset-2-1">Python</a></li><li><a href="#tabset-2-2">R</a></li></ul>
+<ul id="tabset-2" class="panel-tabset-tabby"><li><a data-tabby-default href="#tabset-2-1">Polars</a></li><li><a href="#tabset-2-2">Pandas</a></li><li><a href="#tabset-2-3">R</a></li></ul>
 <div class="tab-content scrollable">
 <div id="tabset-2-1">
 <div class="cell">
@@ -1305,11 +1293,16 @@ Marc Dotson
 </div>
 <div id="tabset-2-2">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href></a><span class="fu">filter</span>(customer_data, college_degree <span class="sc">==</span> <span class="st">&quot;Yes&quot;</span>)</span>
-<span id="cb5-2"><a href></a></span>
-<span id="cb5-3"><a href></a><span class="fu">filter</span>(customer_data, region <span class="sc">!=</span> <span class="st">&quot;West&quot;</span>)</span>
-<span id="cb5-4"><a href></a></span>
-<span id="cb5-5"><a href></a><span class="fu">filter</span>(customer_data, gender <span class="sc">==</span> <span class="st">&quot;Female&quot;</span>, income <span class="sc">&gt;</span> <span class="dv">70000</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href></a>customer_data_pd.loc[customer_data_pd[<span class="st">&#39;college_degree&#39;</span>] <span class="op">==</span> <span class="st">&#39;Yes&#39;</span>]</span>
+<span id="cb5-2"><a href></a>customer_data_pd.loc[customer_data_pd[<span class="st">&#39;region&#39;</span>] <span class="op">!=</span> <span class="st">&#39;West&#39;</span>]</span>
+<span id="cb5-3"><a href></a>customer_data_pd.loc[(customer_data_pd[<span class="st">&#39;gender&#39;</span>] <span class="op">!=</span> <span class="st">&#39;Female&#39;</span>) <span class="op">&amp;</span> (customer_data_pd[<span class="st">&#39;income&#39;</span>] <span class="op">&gt;</span> <span class="dv">70000</span>)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-2-3">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href></a><span class="fu">filter</span>(customer_data, college_degree <span class="sc">==</span> <span class="st">&quot;Yes&quot;</span>)</span>
+<span id="cb6-2"><a href></a><span class="fu">filter</span>(customer_data, region <span class="sc">!=</span> <span class="st">&quot;West&quot;</span>)</span>
+<span id="cb6-3"><a href></a><span class="fu">filter</span>(customer_data, gender <span class="sc">==</span> <span class="st">&quot;Female&quot;</span>, income <span class="sc">&gt;</span> <span class="dv">70000</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 </div>
@@ -1317,19 +1310,24 @@ Marc Dotson
 </section>
 <section id="slice-observations" class="slide level2">
 <h2>Slice Observations</h2>
-<p>Python is <strong>zero-indexed</strong>. This is probably the most problematic (and very computer science-based) difference and why it’s nice to avoid indexing if you can!</p>
-<p>The parameters for Polars’ <code>.slice()</code> are the start index and the length.</p>
+<p>The parameters for Polars’ <code>.slice()</code> method are the start index and the length.</p>
+<p>We similarly don’t need to rely on Pandas’ <code>.iloc[]</code> property.</p>
 <div class="panel-tabset scrollable">
-<ul id="tabset-3" class="panel-tabset-tabby"><li><a data-tabby-default href="#tabset-3-1">Python</a></li><li><a href="#tabset-3-2">R</a></li></ul>
+<ul id="tabset-3" class="panel-tabset-tabby"><li><a data-tabby-default href="#tabset-3-1">Polars</a></li><li><a href="#tabset-3-2">Pandas</a></li><li><a href="#tabset-3-3">R</a></li></ul>
 <div class="tab-content scrollable">
 <div id="tabset-3-1">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href></a>customer_data.<span class="bu">slice</span>(<span class="dv">0</span>, <span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href></a>customer_data.<span class="bu">slice</span>(<span class="dv">0</span>, <span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 <div id="tabset-3-2">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href></a><span class="fu">slice</span>(customer_data, <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href></a>customer_data_pd.iloc[<span class="dv">0</span>:<span class="dv">5</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-3-3">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href></a><span class="fu">slice</span>(customer_data, <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 </div>
@@ -1337,27 +1335,26 @@ Marc Dotson
 </section>
 <section id="arrange-observations" class="slide level2">
 <h2>Arrange Observations</h2>
-<p>It can be strange at first, but <strong>namespacing</strong> is critical.</p>
-<ul>
-<li>A function is preceded by the package name (e.g., <code>pl.col()</code>), unless you import the specific function (e.g., <code>from polars import col</code>).</li>
-<li>A method is preceded by an object name of a certain type (e.g., <code>customer_data.sort()</code>).</li>
-<li>Since object types are tied to packages, the chain back to the corresponding package is always present, explicitly or implicitly.</li>
-</ul>
-<p>Note that its <code>True</code> and <code>False</code>, not <code>TRUE</code> and <code>FALSE</code> or <code>true</code> and <code>false</code>.</p>
+<p>Instead of using <code>[ ]</code> like in Pandas, in Polars we rely on expressions like <code>pl.col()</code>.</p>
 <div class="panel-tabset scrollable">
-<ul id="tabset-4" class="panel-tabset-tabby"><li><a data-tabby-default href="#tabset-4-1">Python</a></li><li><a href="#tabset-4-2">R</a></li></ul>
+<ul id="tabset-4" class="panel-tabset-tabby"><li><a data-tabby-default href="#tabset-4-1">Polars</a></li><li><a href="#tabset-4-2">Pandas</a></li><li><a href="#tabset-4-3">R</a></li></ul>
 <div class="tab-content scrollable">
 <div id="tabset-4-1">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href></a>customer_data.sort(pl.col(<span class="st">&#39;birth_year&#39;</span>))</span>
-<span id="cb8-2"><a href></a>customer_data.sort(pl.col(<span class="st">&#39;birth_year&#39;</span>), descending<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href></a>customer_data.sort(pl.col(<span class="st">&#39;birth_year&#39;</span>))</span>
+<span id="cb10-2"><a href></a>customer_data.sort(pl.col(<span class="st">&#39;birth_year&#39;</span>), descending <span class="op">=</span> <span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 <div id="tabset-4-2">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href></a><span class="fu">arrange</span>(customer_data, birth_year)</span>
-<span id="cb9-2"><a href></a></span>
-<span id="cb9-3"><a href></a><span class="fu">arrange</span>(customer_data, <span class="fu">desc</span>(birth_year))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href></a>customer_data_pd.sort_values(<span class="st">&#39;birth_year&#39;</span>)</span>
+<span id="cb11-2"><a href></a>customer_data_pd.sort_values(<span class="st">&#39;birth_year&#39;</span>, ascending <span class="op">=</span> <span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-4-3">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href></a><span class="fu">arrange</span>(customer_data, birth_year)</span>
+<span id="cb12-2"><a href></a><span class="fu">arrange</span>(customer_data, <span class="fu">desc</span>(birth_year))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 </div>
@@ -1365,43 +1362,48 @@ Marc Dotson
 </section>
 <section id="select-variables" class="slide level2">
 <h2>Select Variables</h2>
-<p>Using single square brackets <code>[ ]</code> creates a <strong>list</strong>. This is similar to creating a vector in R with <code>c()</code>. A list is a fundamental Python object type and can be turned into a Series.</p>
-<p>Function (and method) arguments are also called <strong>parameters</strong>.</p>
-<ul>
-<li>Some parameters are <strong>positional</strong> that have to be specified in the exact position.</li>
-<li>Others are <strong>keyword or named</strong> (like in R).</li>
-</ul>
+<p>Polars separates out <code>.filter()</code> and <code>.select()</code> that are combined in Pandas’ <code>.loc[]</code>.</p>
 <div class="panel-tabset scrollable">
-<ul id="tabset-5" class="panel-tabset-tabby"><li><a data-tabby-default href="#tabset-5-1">Python</a></li><li><a href="#tabset-5-2">R</a></li></ul>
+<ul id="tabset-5" class="panel-tabset-tabby"><li><a data-tabby-default href="#tabset-5-1">Polars</a></li><li><a href="#tabset-5-2">Pandas</a></li><li><a href="#tabset-5-3">R</a></li></ul>
 <div class="tab-content scrollable">
 <div id="tabset-5-1">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href></a>customer_data.select(pl.col(<span class="st">&#39;region&#39;</span>), pl.col(<span class="st">&#39;review_text&#39;</span>))</span>
-<span id="cb10-2"><a href></a>customer_data.select(pl.col([<span class="st">&#39;region&#39;</span>, <span class="st">&#39;review_text&#39;</span>]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href></a>customer_data.select(pl.col(<span class="st">&#39;region&#39;</span>), pl.col(<span class="st">&#39;review_text&#39;</span>))</span>
+<span id="cb13-2"><a href></a>customer_data.select(pl.col([<span class="st">&#39;region&#39;</span>, <span class="st">&#39;review_text&#39;</span>]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 <div id="tabset-5-2">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href></a><span class="fu">select</span>(customer_data, region, review_text)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href></a>customer_data_pd.loc[:, [<span class="st">&#39;region&#39;</span>, <span class="st">&#39;review_text&#39;</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-5-3">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href></a><span class="fu">select</span>(customer_data, region, review_text)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 </div>
 </div>
 </section>
-<section id="mutate-variables" class="slide level2">
-<h2>Mutate Variables</h2>
+<section id="add-variables" class="slide level2">
+<h2>Add Variables</h2>
 <p>Polars is actually a query language, like SQL. So it’s not surprising to see methods with names that more closely mirror queries, like the <code>.with_columns()</code> method.</p>
 <div class="panel-tabset scrollable">
-<ul id="tabset-6" class="panel-tabset-tabby"><li><a data-tabby-default href="#tabset-6-1">Python</a></li><li><a href="#tabset-6-2">R</a></li></ul>
+<ul id="tabset-6" class="panel-tabset-tabby"><li><a data-tabby-default href="#tabset-6-1">Polars</a></li><li><a href="#tabset-6-2">Pandas</a></li><li><a href="#tabset-6-3">R</a></li></ul>
 <div class="tab-content scrollable">
 <div id="tabset-6-1">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href></a>customer_data.with_columns(income <span class="op">=</span> pl.col(<span class="st">&#39;income&#39;</span>) <span class="op">/</span> <span class="dv">1000</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href></a>customer_data.with_columns(income_new <span class="op">=</span> pl.col(<span class="st">&#39;income&#39;</span>) <span class="op">/</span> <span class="dv">1000</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 <div id="tabset-6-2">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href></a><span class="fu">mutate</span>(customer_data, <span class="at">income =</span> income <span class="sc">/</span> <span class="dv">1000</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href></a>customer_data_pd.assign(income_new <span class="op">=</span> customer_data_pd[<span class="st">&#39;income&#39;</span>] <span class="op">/</span> <span class="dv">1000</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-6-3">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href></a><span class="fu">mutate</span>(customer_data, <span class="at">income =</span> income <span class="sc">/</span> <span class="dv">1000</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 </div>
@@ -1411,27 +1413,30 @@ Marc Dotson
 <h2>Join Data Frames</h2>
 <p>Missing values are identified as <code>NaN</code>. Series types include <code>str</code>, <code>bytes</code> (binary), <code>float</code>, <code>bool</code>, and <code>int</code>.</p>
 <div class="panel-tabset scrollable">
-<ul id="tabset-7" class="panel-tabset-tabby"><li><a data-tabby-default href="#tabset-7-1">Python</a></li><li><a href="#tabset-7-2">R</a></li></ul>
+<ul id="tabset-7" class="panel-tabset-tabby"><li><a data-tabby-default href="#tabset-7-1">Polars</a></li><li><a href="#tabset-7-2">Pandas</a></li><li><a href="#tabset-7-3">R</a></li></ul>
 <div class="tab-content scrollable">
 <div id="tabset-7-1">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href></a>store_transactions <span class="op">=</span> pl.read_csv(<span class="st">&#39;store_transactions.csv&#39;</span>)</span>
-<span id="cb14-2"><a href></a>store_transactions.shape</span>
-<span id="cb14-3"><a href></a>store_transactions.columns</span>
-<span id="cb14-4"><a href></a></span>
-<span id="cb14-5"><a href></a>customer_data.join(store_transactions, on<span class="op">=</span><span class="st">&#39;customer_id&#39;</span>, how<span class="op">=</span><span class="st">&#39;left&#39;</span>)</span>
-<span id="cb14-6"><a href></a>customer_data.join(store_transactions, on<span class="op">=</span><span class="st">&#39;customer_id&#39;</span>, how<span class="op">=</span><span class="st">&#39;inner&#39;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href></a>store_transactions <span class="op">=</span> pl.read_csv(<span class="st">&#39;data/store_transactions.csv&#39;</span>)</span>
+<span id="cb19-2"><a href></a>store_transactions</span>
+<span id="cb19-3"><a href></a></span>
+<span id="cb19-4"><a href></a>customer_data.join(store_transactions, on<span class="op">=</span><span class="st">&#39;customer_id&#39;</span>, how<span class="op">=</span><span class="st">&#39;left&#39;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 <div id="tabset-7-2">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href></a>store_transactions <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;store_transactions.csv&quot;</span>)</span>
-<span id="cb15-2"><a href></a></span>
-<span id="cb15-3"><a href></a><span class="fu">glimpse</span>(store_transactions)</span>
-<span id="cb15-4"><a href></a></span>
-<span id="cb15-5"><a href></a><span class="fu">left_join</span>(customer_data, store_transactions, <span class="fu">join_by</span>(customer_id))</span>
-<span id="cb15-6"><a href></a></span>
-<span id="cb15-7"><a href></a><span class="fu">inner_join</span>(customer_data, store_transactions, <span class="fu">join_by</span>(customer_id))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href></a>store_transactions_pd <span class="op">=</span> pd.read_csv(<span class="st">&#39;data/store_transactions.csv&#39;</span>)</span>
+<span id="cb20-2"><a href></a>store_transactions_pd</span>
+<span id="cb20-3"><a href></a></span>
+<span id="cb20-4"><a href></a>customer_data_pd.set_index(<span class="st">&#39;customer_id&#39;</span>).join(store_transactions_pd.set_index(<span class="st">&#39;customer_id&#39;</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-7-3">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href></a>store_transactions <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;store_transactions.csv&quot;</span>)</span>
+<span id="cb21-2"><a href></a>store_transactions</span>
+<span id="cb21-3"><a href></a></span>
+<span id="cb21-4"><a href></a><span class="fu">left_join</span>(customer_data, store_transactions, <span class="fu">join_by</span>(customer_id))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 </div>
@@ -1443,32 +1448,48 @@ Marc Dotson
 <ul>
 <li>The entire chain needs to be surrounded with <code>( )</code></li>
 <li>Each line <em>starts</em> with <code>.</code></li>
-<li>You’ll have to select and run the whole thing at once</li>
+<li>You run the whole block of code at once</li>
 </ul>
 <div class="panel-tabset scrollable">
-<ul id="tabset-8" class="panel-tabset-tabby"><li><a data-tabby-default href="#tabset-8-1">Python</a></li><li><a href="#tabset-8-2">R</a></li></ul>
+<ul id="tabset-8" class="panel-tabset-tabby"><li><a data-tabby-default href="#tabset-8-1">Polars</a></li><li><a href="#tabset-8-2">Pandas</a></li><li><a href="#tabset-8-3">R</a></li></ul>
 <div class="tab-content scrollable">
 <div id="tabset-8-1">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href></a>(customer_data</span>
-<span id="cb16-2"><a href></a> .join(store_transactions, on<span class="op">=</span><span class="st">&#39;customer_id&#39;</span>, how<span class="op">=</span><span class="st">&#39;left&#39;</span>)</span>
-<span id="cb16-3"><a href></a> .<span class="bu">filter</span>(pl.col(<span class="st">&#39;region&#39;</span>) <span class="op">==</span> <span class="st">&#39;West&#39;</span>, pl.col(<span class="st">&#39;feb_2005&#39;</span>) <span class="op">==</span> pl.col(<span class="st">&#39;feb_2005&#39;</span>).<span class="bu">max</span>())</span>
-<span id="cb16-4"><a href></a> .with_columns(age <span class="op">=</span> <span class="dv">2024</span> <span class="op">-</span> pl.col(<span class="st">&#39;birth_year&#39;</span>))</span>
-<span id="cb16-5"><a href></a> .select(pl.col([<span class="st">&#39;age&#39;</span>, <span class="st">&#39;feb_2005&#39;</span>]))</span>
-<span id="cb16-6"><a href></a> .sort(pl.col(<span class="st">&#39;age&#39;</span>), descending<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb16-7"><a href></a> .<span class="bu">slice</span>(<span class="dv">0</span>, <span class="dv">1</span>)</span>
-<span id="cb16-8"><a href></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href></a>(customer_data</span>
+<span id="cb22-2"><a href></a>  .join(store_transactions, on<span class="op">=</span><span class="st">&#39;customer_id&#39;</span>, how<span class="op">=</span><span class="st">&#39;left&#39;</span>)</span>
+<span id="cb22-3"><a href></a>  .<span class="bu">filter</span>(pl.col(<span class="st">&#39;region&#39;</span>) <span class="op">==</span> <span class="st">&#39;West&#39;</span>, pl.col(<span class="st">&#39;feb_2005&#39;</span>) <span class="op">==</span> pl.col(<span class="st">&#39;feb_2005&#39;</span>).<span class="bu">max</span>())</span>
+<span id="cb22-4"><a href></a>  .with_columns(age <span class="op">=</span> <span class="dv">2024</span> <span class="op">-</span> pl.col(<span class="st">&#39;birth_year&#39;</span>))</span>
+<span id="cb22-5"><a href></a>  .select(pl.col([<span class="st">&#39;age&#39;</span>, <span class="st">&#39;feb_2005&#39;</span>]))</span>
+<span id="cb22-6"><a href></a>  .sort(pl.col(<span class="st">&#39;age&#39;</span>), descending<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb22-7"><a href></a>  .<span class="bu">slice</span>(<span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb22-8"><a href></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 <div id="tabset-8-2">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href></a>customer_data <span class="sc">|&gt;</span> </span>
-<span id="cb17-2"><a href></a>  <span class="fu">left_join</span>(store_transactions, <span class="fu">join_by</span>(customer_id)) <span class="sc">|&gt;</span> </span>
-<span id="cb17-3"><a href></a>  <span class="fu">filter</span>(region <span class="sc">==</span> <span class="st">&quot;West&quot;</span>, feb_2005 <span class="sc">==</span> <span class="fu">max</span>(feb_2005)) <span class="sc">|&gt;</span> </span>
-<span id="cb17-4"><a href></a>  <span class="fu">mutate</span>(<span class="at">age =</span> <span class="dv">2024</span> <span class="sc">-</span> birth_year) <span class="sc">|&gt;</span> </span>
-<span id="cb17-5"><a href></a>  <span class="fu">select</span>(age, feb_2005) <span class="sc">|&gt;</span> </span>
-<span id="cb17-6"><a href></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(age)) <span class="sc">|&gt;</span> </span>
-<span id="cb17-7"><a href></a>  <span class="fu">slice</span>(<span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href></a>crm_data_pd <span class="op">=</span> (customer_data_pd</span>
+<span id="cb23-2"><a href></a>  .set_index(<span class="st">&#39;customer_id&#39;</span>)</span>
+<span id="cb23-3"><a href></a>  .join(store_transactions_pd.set_index(<span class="st">&#39;customer_id&#39;</span>))</span>
+<span id="cb23-4"><a href></a>)</span>
+<span id="cb23-5"><a href></a></span>
+<span id="cb23-6"><a href></a>(crm_data_pd</span>
+<span id="cb23-7"><a href></a>  .loc[(crm_data_pd[<span class="st">&#39;region&#39;</span>] <span class="op">==</span> <span class="st">&#39;West&#39;</span>) <span class="op">&amp;</span> (crm_data_pd[<span class="st">&#39;feb_2005&#39;</span>] <span class="op">==</span> crm_data_pd[<span class="st">&#39;feb_2005&#39;</span>].<span class="bu">max</span>())]</span>
+<span id="cb23-8"><a href></a>  .assign(age <span class="op">=</span> <span class="dv">2024</span> <span class="op">-</span> crm_data_pd[<span class="st">&#39;birth_year&#39;</span>])</span>
+<span id="cb23-9"><a href></a>  .loc[:, [<span class="st">&#39;age&#39;</span>, <span class="st">&#39;feb_2005&#39;</span>]]</span>
+<span id="cb23-10"><a href></a>  .sort_values(<span class="st">&#39;age&#39;</span>, ascending <span class="op">=</span> <span class="va">False</span>)</span>
+<span id="cb23-11"><a href></a>  .iloc[<span class="dv">0</span>:<span class="dv">1</span>]</span>
+<span id="cb23-12"><a href></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-8-3">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href></a>customer_data <span class="sc">|&gt;</span> </span>
+<span id="cb24-2"><a href></a>  <span class="fu">left_join</span>(store_transactions, <span class="fu">join_by</span>(customer_id)) <span class="sc">|&gt;</span> </span>
+<span id="cb24-3"><a href></a>  <span class="fu">filter</span>(region <span class="sc">==</span> <span class="st">&quot;West&quot;</span>, feb_2005 <span class="sc">==</span> <span class="fu">max</span>(feb_2005)) <span class="sc">|&gt;</span> </span>
+<span id="cb24-4"><a href></a>  <span class="fu">mutate</span>(<span class="at">age =</span> <span class="dv">2024</span> <span class="sc">-</span> birth_year) <span class="sc">|&gt;</span> </span>
+<span id="cb24-5"><a href></a>  <span class="fu">select</span>(age, feb_2005) <span class="sc">|&gt;</span> </span>
+<span id="cb24-6"><a href></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(age)) <span class="sc">|&gt;</span> </span>
+<span id="cb24-7"><a href></a>  <span class="fu">slice</span>(<span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 </div>
@@ -1476,30 +1497,41 @@ Marc Dotson
 </section>
 <section id="summarize-discrete-data" class="slide level2">
 <h2>Summarize Discrete Data</h2>
-<p>The <code>.agg()</code> method stands for <em>aggregate</em>, which is exactly what <code>summarize()</code> does in R.</p>
+<p>The <code>.agg()</code> method allows us to <em>aggregate</em>.</p>
 <div class="panel-tabset scrollable">
-<ul id="tabset-9" class="panel-tabset-tabby"><li><a data-tabby-default href="#tabset-9-1">Python</a></li><li><a href="#tabset-9-2">R</a></li></ul>
+<ul id="tabset-9" class="panel-tabset-tabby"><li><a data-tabby-default href="#tabset-9-1">Polars</a></li><li><a href="#tabset-9-2">Pandas</a></li><li><a href="#tabset-9-3">R</a></li></ul>
 <div class="tab-content scrollable">
 <div id="tabset-9-1">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href></a>(customer_data</span>
-<span id="cb18-2"><a href></a> .group_by(pl.col(<span class="st">&#39;region&#39;</span>))</span>
-<span id="cb18-3"><a href></a> .agg(n <span class="op">=</span> pl.<span class="bu">len</span>())</span>
-<span id="cb18-4"><a href></a>)</span>
-<span id="cb18-5"><a href></a></span>
-<span id="cb18-6"><a href></a>(customer_data</span>
-<span id="cb18-7"><a href></a> .group_by(pl.col([<span class="st">&#39;region&#39;</span>, <span class="st">&#39;college_degree&#39;</span>]))</span>
-<span id="cb18-8"><a href></a> .agg(n <span class="op">=</span> pl.<span class="bu">len</span>())</span>
-<span id="cb18-9"><a href></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href></a>(customer_data</span>
+<span id="cb25-2"><a href></a>  .group_by(pl.col(<span class="st">&#39;region&#39;</span>))</span>
+<span id="cb25-3"><a href></a>  .agg(n <span class="op">=</span> pl.<span class="bu">len</span>())</span>
+<span id="cb25-4"><a href></a>)</span>
+<span id="cb25-5"><a href></a></span>
+<span id="cb25-6"><a href></a>(customer_data</span>
+<span id="cb25-7"><a href></a>  .group_by(pl.col([<span class="st">&#39;region&#39;</span>, <span class="st">&#39;college_degree&#39;</span>]))</span>
+<span id="cb25-8"><a href></a>  .agg(n <span class="op">=</span> pl.<span class="bu">len</span>())</span>
+<span id="cb25-9"><a href></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 <div id="tabset-9-2">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href></a>customer_data <span class="sc">|&gt;</span> </span>
-<span id="cb19-2"><a href></a>  <span class="fu">count</span>(region)</span>
-<span id="cb19-3"><a href></a></span>
-<span id="cb19-4"><a href></a>customer_data <span class="sc">|&gt;</span> </span>
-<span id="cb19-5"><a href></a>  <span class="fu">count</span>(region, college_degree)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href></a>(customer_data_pd</span>
+<span id="cb26-2"><a href></a>  .value_counts(<span class="st">&#39;region&#39;</span>)</span>
+<span id="cb26-3"><a href></a>)</span>
+<span id="cb26-4"><a href></a></span>
+<span id="cb26-5"><a href></a>(customer_data_pd</span>
+<span id="cb26-6"><a href></a>  .value_counts([<span class="st">&#39;region&#39;</span>, <span class="st">&#39;college_degree&#39;</span>])</span>
+<span id="cb26-7"><a href></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-9-3">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href></a>customer_data <span class="sc">|&gt;</span> </span>
+<span id="cb27-2"><a href></a>  <span class="fu">count</span>(region)</span>
+<span id="cb27-3"><a href></a></span>
+<span id="cb27-4"><a href></a>customer_data <span class="sc">|&gt;</span> </span>
+<span id="cb27-5"><a href></a>  <span class="fu">count</span>(region, college_degree)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 </div>
@@ -1507,37 +1539,45 @@ Marc Dotson
 </section>
 <section id="summarize-continuous-data" class="slide level2">
 <h2>Summarize Continuous Data</h2>
-<p>This is a good example of where object-oriented programming requires a different mindset.</p>
-<ul>
-<li>You might think that there is a general <code>mean()</code> function like in R, but there isn’t and you’d have to load a specific package from the PyData stack and reference its namespace to activate such a function.</li>
-<li>Instead, <code>.mean()</code> is a method for Polars Series and DataFrames.</li>
-</ul>
 <div class="panel-tabset scrollable">
-<ul id="tabset-10" class="panel-tabset-tabby"><li><a data-tabby-default href="#tabset-10-1">Python</a></li><li><a href="#tabset-10-2">R</a></li></ul>
+<ul id="tabset-10" class="panel-tabset-tabby"><li><a data-tabby-default href="#tabset-10-1">Polars</a></li><li><a href="#tabset-10-2">Pandas</a></li><li><a href="#tabset-10-3">R</a></li></ul>
 <div class="tab-content scrollable">
 <div id="tabset-10-1">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href></a>(customer_data</span>
-<span id="cb20-2"><a href></a>  .select(pl.col(<span class="st">&#39;income&#39;</span>))</span>
-<span id="cb20-3"><a href></a>  .mean()</span>
-<span id="cb20-4"><a href></a>)</span>
-<span id="cb20-5"><a href></a></span>
-<span id="cb20-6"><a href></a>(customer_data</span>
-<span id="cb20-7"><a href></a>  .select(pl.col([<span class="st">&#39;income&#39;</span>, <span class="st">&#39;credit&#39;</span>]))</span>
-<span id="cb20-8"><a href></a>  .mean()</span>
-<span id="cb20-9"><a href></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href></a>(customer_data</span>
+<span id="cb28-2"><a href></a>  .select(pl.col(<span class="st">&#39;income&#39;</span>))</span>
+<span id="cb28-3"><a href></a>  .mean()</span>
+<span id="cb28-4"><a href></a>)</span>
+<span id="cb28-5"><a href></a></span>
+<span id="cb28-6"><a href></a>(customer_data</span>
+<span id="cb28-7"><a href></a>  .select(pl.col([<span class="st">&#39;income&#39;</span>, <span class="st">&#39;credit&#39;</span>]))</span>
+<span id="cb28-8"><a href></a>  .mean()</span>
+<span id="cb28-9"><a href></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 <div id="tabset-10-2">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href></a>customer_data <span class="sc">|&gt;</span></span>
-<span id="cb21-2"><a href></a>  <span class="fu">summarize</span>(<span class="at">avg_income =</span> <span class="fu">mean</span>(income))</span>
-<span id="cb21-3"><a href></a></span>
-<span id="cb21-4"><a href></a>customer_data <span class="sc">|&gt;</span></span>
-<span id="cb21-5"><a href></a>  <span class="fu">summarize</span>(</span>
-<span id="cb21-6"><a href></a>    <span class="at">avg_income =</span> <span class="fu">mean</span>(income),</span>
-<span id="cb21-7"><a href></a>    <span class="at">avg_credit =</span> <span class="fu">mean</span>(credit)</span>
-<span id="cb21-8"><a href></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href></a>(customer_data_pd</span>
+<span id="cb29-2"><a href></a>  .loc[:, [<span class="st">&#39;income&#39;</span>]]</span>
+<span id="cb29-3"><a href></a>  .mean()</span>
+<span id="cb29-4"><a href></a>)</span>
+<span id="cb29-5"><a href></a></span>
+<span id="cb29-6"><a href></a>(customer_data_pd</span>
+<span id="cb29-7"><a href></a>  .loc[:, [<span class="st">&#39;income&#39;</span>, <span class="st">&#39;credit&#39;</span>]]</span>
+<span id="cb29-8"><a href></a>  .mean()</span>
+<span id="cb29-9"><a href></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-10-3">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href></a>customer_data <span class="sc">|&gt;</span></span>
+<span id="cb30-2"><a href></a>  <span class="fu">summarize</span>(<span class="at">avg_income =</span> <span class="fu">mean</span>(income))</span>
+<span id="cb30-3"><a href></a></span>
+<span id="cb30-4"><a href></a>customer_data <span class="sc">|&gt;</span></span>
+<span id="cb30-5"><a href></a>  <span class="fu">summarize</span>(</span>
+<span id="cb30-6"><a href></a>    <span class="at">avg_income =</span> <span class="fu">mean</span>(income),</span>
+<span id="cb30-7"><a href></a>    <span class="at">avg_credit =</span> <span class="fu">mean</span>(credit)</span>
+<span id="cb30-8"><a href></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 </div>
@@ -1545,33 +1585,43 @@ Marc Dotson
 </section>
 <section id="summarize-discrete-and-continuous-data" class="slide level2">
 <h2>Summarize Discrete and Continuous Data</h2>
-<p>We only use <code>.agg()</code> with <code>.group_by()</code>.</p>
 <div class="panel-tabset scrollable">
-<ul id="tabset-11" class="panel-tabset-tabby"><li><a data-tabby-default href="#tabset-11-1">Python</a></li><li><a href="#tabset-11-2">R</a></li></ul>
+<ul id="tabset-11" class="panel-tabset-tabby"><li><a data-tabby-default href="#tabset-11-1">Polars</a></li><li><a href="#tabset-11-2">Pandas</a></li><li><a href="#tabset-11-3">R</a></li></ul>
 <div class="tab-content scrollable">
 <div id="tabset-11-1">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href></a>(customer_data</span>
-<span id="cb22-2"><a href></a> .group_by(pl.col([<span class="st">&#39;gender&#39;</span>, <span class="st">&#39;region&#39;</span>]))</span>
-<span id="cb22-3"><a href></a> .agg(</span>
-<span id="cb22-4"><a href></a>   n <span class="op">=</span> pl.<span class="bu">len</span>(), </span>
-<span id="cb22-5"><a href></a>   avg_income <span class="op">=</span> pl.col(<span class="st">&#39;income&#39;</span>).mean(), </span>
-<span id="cb22-6"><a href></a>   avg_credit <span class="op">=</span> pl.col(<span class="st">&#39;credit&#39;</span>).mean()</span>
-<span id="cb22-7"><a href></a>  )</span>
-<span id="cb22-8"><a href></a> .sort(pl.col(<span class="st">&#39;avg_income&#39;</span>), descending<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb22-9"><a href></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href></a>(customer_data</span>
+<span id="cb31-2"><a href></a>  .group_by(pl.col([<span class="st">&#39;gender&#39;</span>, <span class="st">&#39;region&#39;</span>]))</span>
+<span id="cb31-3"><a href></a>  .agg(</span>
+<span id="cb31-4"><a href></a>    avg_income <span class="op">=</span> pl.col(<span class="st">&#39;income&#39;</span>).mean(), </span>
+<span id="cb31-5"><a href></a>    avg_credit <span class="op">=</span> pl.col(<span class="st">&#39;credit&#39;</span>).mean()</span>
+<span id="cb31-6"><a href></a>  )</span>
+<span id="cb31-7"><a href></a>  .sort(pl.col(<span class="st">&#39;avg_income&#39;</span>), descending <span class="op">=</span> <span class="va">True</span>)</span>
+<span id="cb31-8"><a href></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 <div id="tabset-11-2">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href></a>customer_data <span class="sc">|&gt;</span></span>
-<span id="cb23-2"><a href></a>  <span class="fu">group_by</span>(gender, region) <span class="sc">|&gt;</span></span>
-<span id="cb23-3"><a href></a>  <span class="fu">summarize</span>(</span>
-<span id="cb23-4"><a href></a>    <span class="at">n =</span> <span class="fu">n</span>(),</span>
-<span id="cb23-5"><a href></a>    <span class="at">avg_income =</span> <span class="fu">mean</span>(income),</span>
-<span id="cb23-6"><a href></a>    <span class="at">avg_credit =</span> <span class="fu">mean</span>(credit)</span>
-<span id="cb23-7"><a href></a>  ) <span class="sc">|&gt;</span> </span>
-<span id="cb23-8"><a href></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(avg_income))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href></a>(customer_data_pd</span>
+<span id="cb32-2"><a href></a> .groupby([<span class="st">&#39;gender&#39;</span>, <span class="st">&#39;region&#39;</span>])</span>
+<span id="cb32-3"><a href></a> .agg(</span>
+<span id="cb32-4"><a href></a>   avg_income <span class="op">=</span> (<span class="st">&#39;income&#39;</span>, <span class="st">&#39;mean&#39;</span>), </span>
+<span id="cb32-5"><a href></a>   avg_credit <span class="op">=</span> (<span class="st">&#39;credit&#39;</span>, <span class="st">&#39;mean&#39;</span>)</span>
+<span id="cb32-6"><a href></a>  )</span>
+<span id="cb32-7"><a href></a> .sort_values(<span class="st">&#39;avg_income&#39;</span>, ascending <span class="op">=</span> <span class="va">False</span>)</span>
+<span id="cb32-8"><a href></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-11-3">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href></a>customer_data <span class="sc">|&gt;</span></span>
+<span id="cb33-2"><a href></a>  <span class="fu">group_by</span>(gender, region) <span class="sc">|&gt;</span></span>
+<span id="cb33-3"><a href></a>  <span class="fu">summarize</span>(</span>
+<span id="cb33-4"><a href></a>    <span class="at">n =</span> <span class="fu">n</span>(),</span>
+<span id="cb33-5"><a href></a>    <span class="at">avg_income =</span> <span class="fu">mean</span>(income),</span>
+<span id="cb33-6"><a href></a>    <span class="at">avg_credit =</span> <span class="fu">mean</span>(credit)</span>
+<span id="cb33-7"><a href></a>  ) <span class="sc">|&gt;</span> </span>
+<span id="cb33-8"><a href></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(avg_income))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 </div>
@@ -1579,6 +1629,7 @@ Marc Dotson
 </section>
 <section id="next-steps" class="slide level2">
 <h2>Next Steps</h2>
+<p>We haven’t even used lazy evaluation!</p>
 <ul>
 <li><a href="https://docs.pola.rs">Polars</a> is still under development.</li>
 </ul>
@@ -1587,7 +1638,7 @@ Marc Dotson
 
 </div>
 </div>
-</section></section>
+</section>
     </div>
   </div>
 

@@ -74,7 +74,7 @@ customer_data
 
 Polars **DataFrames** have methods that mirror SQL. DataFrames are still composed of columns called **Series**, however, unlike Pandas DataFrames, Polars DataFrames don't have a **row index** (so no need to `.reset_index()`).
 
-Additionally, instead of relying on Panda's `.loc[]` **property**, Polars includes function-like **expressions** like `pl.col('column_name')`.
+Additionally, instead of relying on Pandas' `.loc[]` **property**, Polars includes function-like **expressions** like `pl.col('column_name')`.
 
 ::: {.panel-tabset .scrollable}
 ## Polars
@@ -106,7 +106,7 @@ filter(customer_data, gender == "Female", income > 70000)
 
 The parameters for Polars' `.slice()` method are the start index and the length.
 
-We similarly don't need to rely on Panda's `.iloc[]` property.
+We similarly don't need to rely on Pandas' `.iloc[]` property.
 
 ::: {.panel-tabset .scrollable}
 ## Polars
@@ -243,7 +243,7 @@ While possible with Python code generally, Polars embraces writing consecutive l
 
 - The entire chain needs to be surrounded with `( )`
 - Each line *starts* with `.`
-- You run the whole black of code at once
+- You run the whole block of code at once
 
 ::: {.panel-tabset .scrollable}
 ## Polars
@@ -291,20 +291,32 @@ customer_data |>
 
 ## Summarize Discrete Data
 
-The `.agg()` method stands for *aggregate*, which is exactly what `summarize()` does in R.
+The `.agg()` method allows us to *aggregate*.
 
 ::: {.panel-tabset .scrollable}
 ## Polars
 
 ```{python}
 (customer_data
- .group_by(pl.col('region'))
- .agg(n = pl.len())
+  .group_by(pl.col('region'))
+  .agg(n = pl.len())
 )
 
 (customer_data
- .group_by(pl.col(['region', 'college_degree']))
- .agg(n = pl.len())
+  .group_by(pl.col(['region', 'college_degree']))
+  .agg(n = pl.len())
+)
+```
+
+## Pandas
+
+```{python}
+(customer_data_pd
+  .value_counts('region')
+)
+
+(customer_data_pd
+  .value_counts(['region', 'college_degree'])
 )
 ```
 
@@ -321,11 +333,6 @@ customer_data |>
 
 ## Summarize Continuous Data
 
-This is a good example of where object-oriented programming requires a different mindset.
-
-- You might think that there is a general `mean()` function like in R, but there isn't and you'd have to load a specific package from the PyData stack and reference its namespace to activate such a function.
-- Instead, `.mean()` is a method for Polars Series and DataFrames.
-
 ::: {.panel-tabset .scrollable}
 ## Polars
 
@@ -337,6 +344,20 @@ This is a good example of where object-oriented programming requires a different
 
 (customer_data
   .select(pl.col(['income', 'credit']))
+  .mean()
+)
+```
+
+## Pandas
+
+```{python}
+(customer_data_pd
+  .loc[:, ['income']]
+  .mean()
+)
+
+(customer_data_pd
+  .loc[:, ['income', 'credit']]
   .mean()
 )
 ```
@@ -357,20 +378,30 @@ customer_data |>
 
 ## Summarize Discrete and Continuous Data
 
-We only use `.agg()` with `.group_by()`.
-
 ::: {.panel-tabset .scrollable}
 ## Polars
 
 ```{python}
 (customer_data
- .group_by(pl.col(['gender', 'region']))
- .agg(
-   n = pl.len(), 
-   avg_income = pl.col('income').mean(), 
-   avg_credit = pl.col('credit').mean()
+  .group_by(pl.col(['gender', 'region']))
+  .agg(
+    avg_income = pl.col('income').mean(), 
+    avg_credit = pl.col('credit').mean()
   )
- .sort(pl.col('avg_income'), descending=True)
+  .sort(pl.col('avg_income'), descending = True)
+)
+```
+
+## Pandas
+
+```{python}
+(customer_data_pd
+ .groupby(['gender', 'region'])
+ .agg(
+   avg_income = ('income', 'mean'), 
+   avg_credit = ('credit', 'mean')
+  )
+ .sort_values('avg_income', ascending = False)
 )
 ```
 
